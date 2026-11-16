@@ -1,4 +1,4 @@
-# フィボナッチ数の公式を線形代数で導く
+# フィボナッチ数の一般項を線形代数で導く
 
 こんにちは。blue_jamです。今日は、大学で学ぶ線形代数の知識を使って、フィボナッチ数の公式を求めていきます。
 
@@ -94,13 +94,13 @@ $$
 
 ### 固有値と固有ベクトル
 
-正方行列 $A$ について、次の式を満たす数 $\lambda$ と、零ベクトルではない2行1列のベクトル $\boldsymbol{x}$ を、それぞれ固有値、固有ベクトルと呼びます。
+正方行列 $A$ について、次の式を満たす数 $\lambda$ と、0でない数が含まれる2行1列の行列 $\boldsymbol{x}$ を、それぞれ固有値、固有ベクトルと呼びます。
 
 $$
 A\boldsymbol{x} = \lambda \boldsymbol{x}
 $$
 
-ベクトルの $\lambda$ 倍は、ベクトルのすべての成分を $\lambda$ 倍したものです。
+行列の $\lambda$ 倍は、行列のすべての成分を $\lambda$ 倍したものです。
 
 $$
 A=\begin{pmatrix}
@@ -127,7 +127,7 @@ $$
 
 ### 対角化
 
-行列 $A$ の2つの固有値を $\lambda_1, \lambda_2$、それぞれに対応する固有ベクトルを $\boldsymbol{x}_1, \boldsymbol{x}_2$ とします。$\boldsymbol{x}_1$ と $\boldsymbol{x}_2$ が一次独立であるとき、
+行列 $A$ の2つの固有値を $\lambda_1, \lambda_2$、それぞれに対応する固有ベクトルを $\boldsymbol{x}_1, \boldsymbol{x}_2$ とします。$\boldsymbol{x}_1$ と $\boldsymbol{x}_2$ が特定の条件を満たせば、
 
 $$
 P = \begin{pmatrix} \boldsymbol{x}_1 & \boldsymbol{x}_2 \end{pmatrix}
