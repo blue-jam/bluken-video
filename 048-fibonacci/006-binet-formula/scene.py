@@ -192,29 +192,126 @@ class DeriveBinetFormula(Scene):
         self.play(FadeOut(VGroup(diagonal, power_identity)))
         title2 = Text("公式を導く", font_size=42, color=BLUE).to_edge(UP)
         givens2 = VGroup(
-            a_matrix, p_matrix, MathTex(r"P^{-1}=\begin{pmatrix}1&\lambda_2\\-1&\lambda_1\end{pmatrix}")
+            a_matrix,
+            p_matrix,
+            MathTex(
+                r"P^{-1}=\frac1{\lambda_1-\lambda_2}"
+                r"\begin{pmatrix}1&-\lambda_2\\-1&\lambda_1\end{pmatrix}"
+            ),
         ).arrange(RIGHT, buff=1.0).next_to(title2, DOWN, buff=0.4)
         relation = MathTex(
             r"A^n=P"
             r"\begin{pmatrix}\lambda_1^n&0\\0&\lambda_2^n\end{pmatrix}P^{-1}",
             font_size=48,
         ).next_to(givens2, DOWN, buff=0.5)
+
+        # 1 本の等式の中で、まず P だけを具体的な行列に置き換える。
+        p_substituted = MathTex(
+            r"A^n="
+            r"\begin{pmatrix}\lambda_1&\lambda_2\\1&1\end{pmatrix}"
+            r"\begin{pmatrix}\lambda_1^n&0\\0&\lambda_2^n\end{pmatrix}"
+            r"P^{-1}",
+            font_size=43,
+        ).move_to(relation)
+
+        # P と対角行列の積を、各成分の計算が見える形で表示する。
+        p_for_product = Matrix(
+            [[r"\lambda_1", r"\lambda_2"], ["1", "1"]],
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.62)
+        diagonal_for_product = Matrix(
+            [[r"\lambda_1^n", "0"], ["0", r"\lambda_2^n"]],
+            h_buff=1.35,
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.62)
+        p_inv_for_product = MathTex(r"P^{-1}")
+        first_result_matrix = Matrix(
+            [
+                [r"\lambda_1^{n+1}", r"\lambda_2^{n+1}"],
+                [r"\lambda_1^n", r"\lambda_2^n"],
+            ],
+            h_buff=1.65,
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.62)
+        first_result_matrix.get_entries().set_opacity(0)
+        animated_product = VGroup(
+            MathTex(r"A^n=", font_size=33),
+            p_for_product,
+            diagonal_for_product,
+            p_inv_for_product,
+            MathTex("=", font_size=33),
+            first_result_matrix,
+            MathTex(r"P^{-1}", font_size=33),
+        ).arrange(RIGHT, buff=0.22).next_to(givens2, DOWN, buff=0.5)
+
+        # 最後に P^{-1} も具体化する。
         product = MathTex(
             r"A^n=\frac1{\lambda_1-\lambda_2}"
             r"\begin{pmatrix}\lambda_1^{n+1}&\lambda_2^{n+1}\\\lambda_1^n&\lambda_2^n\end{pmatrix}"
             r"\begin{pmatrix}1&-\lambda_2\\-1&\lambda_1\end{pmatrix}",
             font_size=41,
-        ).next_to(relation, DOWN, buff=0.65)
+        ).move_to(animated_product)
         self.play(
             ReplacementTransform(title, title2),
             Write(givens2)
         )
         self.play(Write(relation))
-        self.play(Write(product))
+        self.play(ReplacementTransform(relation, p_substituted))
+        self.wait(0.4)
+        self.play(ReplacementTransform(p_substituted, animated_product))
+
+        first_calculations = [
+            (0, 0, r"\lambda_1", r"\lambda_1^n", r"\lambda_2", "0", r"\lambda_1^{n+1}"),
+            (0, 1, r"\lambda_1", "0", r"\lambda_2", r"\lambda_2^n", r"\lambda_2^{n+1}"),
+            (1, 0, "1", r"\lambda_1^n", "1", "0", r"\lambda_1^n"),
+            (1, 1, "1", "0", "1", r"\lambda_2^n", r"\lambda_2^n"),
+        ]
+        first_answers = VGroup()
+        for row_index, column_index, left_1, right_1, left_2, right_2, answer in first_calculations:
+            row = p_for_product.get_rows()[row_index]
+            column = diagonal_for_product.get_columns()[column_index]
+            result_entry = first_result_matrix.get_entries()[row_index * 2 + column_index]
+            row_box = SurroundingRectangle(row, color=RED, buff=0.1)
+            column_box = SurroundingRectangle(column, color=BLUE, buff=0.1)
+            result_box = SurroundingRectangle(result_entry, color=GREEN, buff=0.12)
+            self.play(Create(row_box), Create(column_box), Create(result_box))
+
+            calculation = MathTex(
+                left_1,
+                rf"\left({right_1}\right)",
+                "+",
+                left_2,
+                rf"\left({right_2}\right)",
+                "=",
+                answer,
+                font_size=25,
+            ).next_to(animated_product, DOWN, buff=0.5)
+            self.play(
+                TransformFromCopy(row[0], calculation[0]),
+                TransformFromCopy(column[0], calculation[1]),
+                Write(calculation[2]),
+                TransformFromCopy(row[1], calculation[3]),
+                TransformFromCopy(column[1], calculation[4]),
+            )
+            self.play(Write(calculation[5:]))
+            answer_in_matrix = result_entry.copy().set_opacity(1)
+            self.play(
+                TransformFromCopy(calculation[-1], answer_in_matrix),
+                Flash(result_box, color=GREEN),
+            )
+            first_answers.add(answer_in_matrix)
+            self.play(FadeOut(VGroup(row_box, column_box, result_box, calculation)))
+
+        self.wait(0.4)
+        self.play(
+            ReplacementTransform(VGroup(animated_product, first_answers), product),
+        )
         self.wait()
 
         # 下書き14: 積を計算し、1行2列成分だけを取り出す。
-        self.play(FadeOut(product))
         left_matrix = Matrix(
             [[r"\lambda_1^{n+1}", r"\lambda_2^{n+1}"], [r"\lambda_1^n", r"\lambda_2^n"]],
             h_buff=1.65,
@@ -237,14 +334,14 @@ class DeriveBinetFormula(Scene):
             right_bracket=")",
         ).scale(0.62)
         result_matrix.get_entries().set_opacity(0)
-        animated_product = VGroup(
+        final_animated_product = VGroup(
             MathTex(r"A^n=\frac1{\lambda_1-\lambda_2}", font_size=33),
             left_matrix,
             right_matrix,
             MathTex("=", font_size=33),
             result_matrix,
-        ).arrange(RIGHT, buff=0.25).next_to(relation, DOWN, buff=0.45)
-        self.play(Write(animated_product))
+        ).arrange(RIGHT, buff=0.25).next_to(givens2, DOWN, buff=0.45)
+        self.play(ReplacementTransform(product, final_animated_product))
 
         calculations = [
             (0, 0, r"\lambda_1^{n+1}", r"1", r"\lambda_2^{n+1}", r"-1", r"\lambda_1^{n+1}-\lambda_2^{n+1}"),
@@ -271,7 +368,7 @@ class DeriveBinetFormula(Scene):
                 "=",
                 answer,
                 font_size=25,
-            ).next_to(animated_product, DOWN, buff=0.55)
+            ).next_to(final_animated_product, DOWN, buff=0.55)
             row_terms = VGroup(
                 MathTex(left_1, font_size=25).move_to(expression_layout[0]),
                 MathTex(left_2, font_size=25).move_to(expression_layout[3]),
@@ -318,23 +415,22 @@ class DeriveBinetFormula(Scene):
             r"\end{pmatrix}",
             font_size=34,
         ).move_to(product)
-        self.play(FadeOut(VGroup(animated_product, displayed_answers)), Write(expanded))
+        self.play(FadeOut(VGroup(final_animated_product, displayed_answers)), Write(expanded))
         self.wait()
 
         entry = MathTex(
-            r"F_n=(A^n)_{1,2}=\frac{\lambda_1^n-\lambda_2^n}{\lambda_1-\lambda_2}",
+            r"F_n=\frac{\lambda_1^n-\lambda_2^n}{\lambda_1-\lambda_2}",
             font_size=47,
         )
         entry.next_to(expanded, DOWN, buff=0.6)
         self.play(Write(entry))
-        self.play(Circumscribe(entry, color=YELLOW))
 
         bine = MathTex(
             r"F_n=\frac1{\sqrt5}\left\{\left(\frac{1+\sqrt5}{2}\right)^n-"
             r"\left(\frac{1-\sqrt5}{2}\right)^n\right\}",
             font_size=43,
         ).move_to(ORIGIN)
-        self.play(FadeOut(VGroup(expanded, relation, entry)), title2.animate.to_edge(UP))
+        self.play(FadeOut(VGroup(expanded, entry)), title2.animate.to_edge(UP))
         self.play(Write(bine))
         self.play(Circumscribe(bine, color=YELLOW))
         self.wait(2)
