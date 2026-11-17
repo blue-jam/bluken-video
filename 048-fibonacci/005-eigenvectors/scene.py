@@ -75,7 +75,7 @@ class FibonacciEigenvectors(Scene):
                 "=",
                 answer,
                 font_size=33,
-            ).to_edge(DOWN, buff=0.7)
+            ).next_to(vector_product, DOWN, buff=0.7)
             row_terms = VGroup(
                 MathTex(first_a, font_size=33).move_to(expression_layout[0]),
                 MathTex(second_a, font_size=33).move_to(expression_layout[3]),
@@ -122,7 +122,7 @@ class FibonacciEigenvectors(Scene):
         self.play(Write(relation))
         self.wait()
 
-        self.play(FadeOut(VGroup(equation, expanded, relation)))
+        self.play(FadeOut(VGroup(expanded, relation)))
         choose = VGroup(
             MathTex(r"x_2=1", font_size=37),
             Text("とすれば", font_size=29),
@@ -136,14 +136,23 @@ class FibonacciEigenvectors(Scene):
             r"\lambda_1=\frac{1+\sqrt5}{2},\qquad\lambda_2=\frac{1-\sqrt5}{2}",
             font_size=38,
         ).next_to(vectors, DOWN, buff=0.45)
+        self.play(Write(choose))
+        self.play(Write(vectors))
+        self.play(Write(lambdas))
+        self.wait()
+
+        shifted_vectors = vectors.copy().next_to(title, DOWN, buff=1)
+        shifted_lambdas = lambdas.copy().next_to(shifted_vectors, DOWN, buff=0.45)
+        self.play(
+            FadeOut(known, choose),
+            vectors.animate.move_to(shifted_vectors),
+            lambdas.animate.move_to(shifted_lambdas),
+        )
         p_matrix = MathTex(
             r"P=(\boldsymbol{x}_1\ \boldsymbol{x}_2)="
             r"\begin{pmatrix}\frac{1+\sqrt5}{2}&\frac{1-\sqrt5}{2}\\1&1\end{pmatrix}",
             font_size=41,
         ).next_to(lambdas, DOWN, buff=0.5)
-        self.play(Write(choose))
-        self.play(Write(vectors))
-        self.play(Write(lambdas))
         self.play(Write(p_matrix))
         self.play(Circumscribe(p_matrix, color=YELLOW))
         self.wait(2)

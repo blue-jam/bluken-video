@@ -25,13 +25,11 @@ class FibonacciMatrixExpression(Scene):
         self.play(FadeOut(VGroup(matrix, row_box, column_box, row_label, column_label, entry_label, entry_arrow)))
         left_matrix = Matrix(
             [[r"a_{11}", r"a_{12}"], [r"a_{21}", r"a_{22}"]],
-            h_buff=1.25,
             left_bracket="(",
             right_bracket=")",
         ).scale(0.72)
         right_matrix = Matrix(
             [[r"b_{11}", r"b_{12}"], [r"b_{21}", r"b_{22}"]],
-            h_buff=1.25,
             left_bracket="(",
             right_bracket=")",
         ).scale(0.72)
@@ -83,7 +81,7 @@ class FibonacciMatrixExpression(Scene):
                 second_a,
                 second_b,
                 font_size=31,
-            ).to_edge(DOWN, buff=0.8)
+            ).next_to(guide, DOWN, buff=0.35)
             row_terms = VGroup(
                 MathTex(first_a, font_size=31).move_to(expression_layout[0]),
                 MathTex(second_a, font_size=31).move_to(expression_layout[3]),
@@ -136,7 +134,7 @@ class FibonacciMatrixExpression(Scene):
         ).next_to(title, DOWN, buff=0.4)
         self.play(Write(title), Write(identity))
 
-        def animate_numeric_product(power, left_values, right_values, result_values):
+        def animate_numeric_product(obj, power, left_values, right_values, result_values):
             """行と列を順に取り出して、数値行列の積を1成分ずつ計算する。"""
             power_label = MathTex(rf"A^{power}=", font_size=38)
             left = Matrix(left_values, left_bracket="(", right_bracket=")").scale(0.72)
@@ -144,13 +142,12 @@ class FibonacciMatrixExpression(Scene):
             equals = MathTex("=", font_size=38)
             result = Matrix(
                 result_values,
-                h_buff=1.5,
                 left_bracket="(",
                 right_bracket=")",
             ).scale(0.72)
             result.get_entries().set_opacity(0)
             equation = VGroup(power_label, left, right, equals, result).arrange(RIGHT, buff=0.3)
-            equation.next_to(identity, DOWN, buff=0.55)
+            equation.next_to(obj, DOWN, buff=0.55)
 
             self.play(Write(power_label))
             # A^2 を A・A に、A^3 を A・A^2 に分ける段階を明示する。
@@ -170,7 +167,7 @@ class FibonacciMatrixExpression(Scene):
 
                     row_box = SurroundingRectangle(row, color=RED, buff=0.12)
                     column_box = SurroundingRectangle(column, color=BLUE, buff=0.12)
-                    result_box = SurroundingRectangle(result_entry, color=GREEN, buff=0.14)
+                    result_box = SurroundingRectangle(result_entry, color=GREEN, buff=0.12)
                     self.play(Create(row_box), Create(column_box), Create(result_box))
 
                     expression_layout = MathTex(
@@ -184,7 +181,7 @@ class FibonacciMatrixExpression(Scene):
                         "=",
                         str(answer),
                         font_size=34,
-                    ).to_edge(DOWN, buff=0.75)
+                    ).next_to(equation, DOWN, buff=0.75)
                     row_terms = VGroup(
                         MathTex(str(first_a), font_size=34).move_to(expression_layout[0]),
                         MathTex(str(second_a), font_size=34).move_to(expression_layout[4]),
@@ -241,7 +238,6 @@ class FibonacciMatrixExpression(Scene):
             self.wait(0.5)
             return VGroup(equation, answers)
 
-        square = animate_numeric_product(2, [[1, 1], [1, 0]], [[1, 1], [1, 0]], [[2, 1], [1, 1]])
-        self.play(FadeOut(square))
-        cube = animate_numeric_product(3, [[1, 1], [1, 0]], [[2, 1], [1, 1]], [[3, 2], [2, 1]])
+        square = animate_numeric_product(identity, 2, [[1, 1], [1, 0]], [[1, 1], [1, 0]], [[2, 1], [1, 1]])
+        animate_numeric_product(square, 3, [[1, 1], [1, 0]], [[2, 1], [1, 1]], [[3, 2], [2, 1]])
         self.wait(2)
