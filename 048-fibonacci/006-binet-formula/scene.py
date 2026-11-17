@@ -196,7 +196,8 @@ class DeriveBinetFormula(Scene):
             p_matrix,
             MathTex(
                 r"P^{-1}=\frac1{\lambda_1-\lambda_2}"
-                r"\begin{pmatrix}1&-\lambda_2\\-1&\lambda_1\end{pmatrix}"
+                r"\begin{pmatrix}1&-\lambda_2\\-1&\lambda_1\end{pmatrix}",
+                font_size=38,
             ),
         ).arrange(RIGHT, buff=1.0).next_to(title2, DOWN, buff=0.4)
         relation = MathTex(
@@ -226,7 +227,7 @@ class DeriveBinetFormula(Scene):
             left_bracket="(",
             right_bracket=")",
         ).scale(0.62)
-        p_inv_for_product = MathTex(r"P^{-1}")
+        p_inv_for_product = MathTex(r"P^{-1}", font_size=33)
         first_result_matrix = Matrix(
             [
                 [r"\lambda_1^{n+1}", r"\lambda_2^{n+1}"],
@@ -414,23 +415,79 @@ class DeriveBinetFormula(Scene):
             r"\lambda_1^n-\lambda_2^n&-\lambda_2\lambda_1^n+\lambda_1\lambda_2^n"
             r"\end{pmatrix}",
             font_size=34,
-        ).move_to(product)
-        self.play(FadeOut(VGroup(final_animated_product, displayed_answers)), Write(expanded))
+        ).next_to(title2, DOWN, buff=0.55)
+        self.play(
+            FadeOut(VGroup(final_animated_product, displayed_answers, givens2)),
+            Write(expanded),
+        )
         self.wait()
 
         entry = MathTex(
-            r"F_n=\frac{\lambda_1^n-\lambda_2^n}{\lambda_1-\lambda_2}",
+            r"F_n=\frac{1}{\lambda_1-\lambda_2}(\lambda_1^n-\lambda_2^n)",
             font_size=47,
         )
         entry.next_to(expanded, DOWN, buff=0.6)
         self.play(Write(entry))
+
+        # 固有値を一般項へ代入し、分母が sqrt(5) になるまでを段階的に示す。
+        eigenvalues = MathTex(
+            r"\lambda_1=\frac{1+\sqrt5}{2},\qquad"
+            r"\lambda_2=\frac{1-\sqrt5}{2}",
+            font_size=43,
+        ).next_to(entry, DOWN, buff=0.45)
+        self.play(Write(eigenvalues))
+        self.wait(0.5)
+
+        substituted = MathTex(
+            r"F_n=\frac{1}{"
+            r"\frac{1+\sqrt5}{2}-\frac{1-\sqrt5}{2}"
+            r"}"
+            r"\left\{\left(\frac{1+\sqrt5}{2}\right)^n-"
+            r"\left(\frac{1-\sqrt5}{2}\right)^n\right\}"
+            ,
+            font_size=40,
+        ).next_to(title2, DOWN, 0.55)
+        self.play(
+            FadeOut(expanded),
+            ReplacementTransform(VGroup(entry, eigenvalues), substituted),
+            title2.animate.to_edge(UP),
+            run_time=1.8,
+        )
+        self.wait(0.5)
+
+        denominator_steps = VGroup(
+            MathTex(
+                r"\lambda_1-\lambda_2"
+                r"=\frac{1+\sqrt5}{2}-\frac{1-\sqrt5}{2}",
+                font_size=38,
+            ),
+            MathTex(
+                r"=\frac{(1+\sqrt5)-(1-\sqrt5)}{2}",
+                font_size=38,
+            ),
+            MathTex(
+                r"=\frac{2\sqrt5}{2}=\sqrt5",
+                font_size=38,
+            ),
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.24)
+        denominator_steps.next_to(substituted, DOWN, buff=0.55)
+        denominator_steps.set_color(YELLOW)
+
+        self.play(Write(denominator_steps[0]))
+        self.play(Write(denominator_steps[1]))
+        self.play(Write(denominator_steps[2]))
+        self.play(Circumscribe(denominator_steps[2][-2:], color=YELLOW))
+        self.wait(0.5)
 
         bine = MathTex(
             r"F_n=\frac1{\sqrt5}\left\{\left(\frac{1+\sqrt5}{2}\right)^n-"
             r"\left(\frac{1-\sqrt5}{2}\right)^n\right\}",
             font_size=43,
         ).move_to(ORIGIN)
-        self.play(FadeOut(VGroup(expanded, entry)), title2.animate.to_edge(UP))
-        self.play(Write(bine))
+        self.play(
+            FadeOut(denominator_steps),
+            ReplacementTransform(substituted, bine),
+            run_time=1.6,
+        )
         self.play(Circumscribe(bine, color=YELLOW))
         self.wait(2)
