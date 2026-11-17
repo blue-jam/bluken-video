@@ -30,16 +30,69 @@ class DiagonalizationIdea(Scene):
         equation.generate_target()
         equation.target.next_to(title, DOWN, buff=0.45)
         self.play(MoveToTarget(equation))
-        square = MathTex(
-            r"\begin{pmatrix}\lambda_1&0\\0&\lambda_2\end{pmatrix}^{2}="
-            r"\begin{pmatrix}\lambda_1^2&0\\0&\lambda_2^2\end{pmatrix}",
-            font_size=46,
-        ).next_to(equation, DOWN, buff=0.75)
+        diagonal_left = Matrix(
+            [[r"\lambda_1", "0"], ["0", r"\lambda_2"]],
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.68)
+        diagonal_right = Matrix(
+            [[r"\lambda_1", "0"], ["0", r"\lambda_2"]],
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.68)
+        square_result = Matrix(
+            [["?", "?"], ["?", "?"]],
+            h_buff=2.2,
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.68)
+        square = VGroup(
+            diagonal_left,
+            diagonal_right,
+            MathTex("="),
+            square_result,
+        ).arrange(RIGHT, buff=0.35).next_to(equation, DOWN, buff=0.55)
         general = MathTex(
             r"\begin{pmatrix}\lambda_1&0\\0&\lambda_2\end{pmatrix}^{k}="
             r"\begin{pmatrix}\lambda_1^k&0\\0&\lambda_2^k\end{pmatrix}",
-            font_size=46,
-        ).next_to(square, DOWN, buff=0.65)
+            font_size=42,
+        ).to_edge(DOWN, buff=0.35)
         self.play(Write(square))  # 下書き6・①
+
+        square_calculations = [
+            (0, 0, r"\lambda_1\cdot\lambda_1", r"0\cdot0", r"\lambda_1^2"),
+            (0, 1, r"\lambda_1\cdot0", r"0\cdot\lambda_2", "0"),
+            (1, 0, r"0\cdot\lambda_1", r"\lambda_2\cdot0", "0"),
+            (1, 1, r"0\cdot0", r"\lambda_2\cdot\lambda_2", r"\lambda_2^2"),
+        ]
+        for row_index, column_index, first_product, second_product, answer in square_calculations:
+            row = diagonal_left.get_rows()[row_index]
+            column = diagonal_right.get_columns()[column_index]
+            result_entry = square_result.get_entries()[row_index * 2 + column_index]
+            row_box = SurroundingRectangle(row, color=RED, buff=0.1)
+            column_box = SurroundingRectangle(column, color=BLUE, buff=0.1)
+            result_box = SurroundingRectangle(result_entry, color=GREEN, buff=0.12)
+            self.play(Create(row_box), Create(column_box), Create(result_box))
+
+            calculation = MathTex(
+                first_product,
+                "+",
+                second_product,
+                "=",
+                answer,
+                font_size=31,
+            ).to_edge(DOWN, buff=0.45)
+            self.play(
+                TransformFromCopy(row, calculation[0]),
+                Write(calculation[1]),
+                TransformFromCopy(column, calculation[2]),
+            )
+            self.play(Write(calculation[3:]))
+            self.play(
+                Transform(result_entry, MathTex(answer, font_size=32).move_to(result_entry)),
+                Flash(result_box, color=GREEN),
+            )
+            self.play(FadeOut(VGroup(row_box, column_box, result_box, calculation)))
+
         self.play(Write(general))  # 下書き6・②
         self.wait(2)

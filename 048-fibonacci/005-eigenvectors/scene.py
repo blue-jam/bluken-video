@@ -25,6 +25,77 @@ class FibonacciEigenvectors(Scene):
         relation = MathTex(r"x_1=\frac{1\pm\sqrt5}{2}x_2", font_size=41).next_to(expanded, DOWN, buff=0.5)
         self.play(Write(title), Write(known))
         self.play(Write(equation))
+
+        self.play(FadeOut(equation))
+        coefficient_matrix = Matrix(
+            [["1", "1"], ["1", "0"]],
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.72)
+        vector = Matrix(
+            [[r"x_1"], [r"x_2"]],
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.72)
+        result_vector = Matrix(
+            [["?"], ["?"]],
+            h_buff=2.1,
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.72)
+        vector_product = VGroup(
+            coefficient_matrix,
+            vector,
+            MathTex("="),
+            result_vector,
+        ).arrange(RIGHT, buff=0.4).move_to(equation)
+        self.play(Write(vector_product))
+
+        vector_calculations = [
+            (0, r"1\cdot x_1", r"1\cdot x_2", r"x_1+x_2"),
+            (1, r"1\cdot x_1", r"0\cdot x_2", r"x_1"),
+        ]
+        for row_index, first_product, second_product, answer in vector_calculations:
+            row = coefficient_matrix.get_rows()[row_index]
+            column = vector.get_columns()[0]
+            result_entry = result_vector.get_entries()[row_index]
+            row_box = SurroundingRectangle(row, color=RED, buff=0.12)
+            column_box = SurroundingRectangle(column, color=BLUE, buff=0.12)
+            result_box = SurroundingRectangle(result_entry, color=GREEN, buff=0.14)
+            self.play(Create(row_box), Create(column_box), Create(result_box))
+
+            extracted_row = row.copy().arrange(RIGHT, buff=0.35)
+            extracted_column = column.copy().arrange(DOWN, buff=0.18)
+            extracted = VGroup(
+                extracted_row,
+                MathTex(r"\cdot"),
+                extracted_column,
+            ).arrange(RIGHT, buff=0.3).to_edge(DOWN, buff=0.7).shift(LEFT * 3.5)
+            self.play(
+                TransformFromCopy(row, extracted_row),
+                Write(extracted[1]),
+                TransformFromCopy(column, extracted_column),
+            )
+
+            calculation = MathTex(
+                first_product,
+                "+",
+                second_product,
+                "=",
+                answer,
+                font_size=33,
+            ).next_to(extracted, RIGHT, buff=0.5)
+            self.play(Write(calculation[:3]))
+            self.play(Write(calculation[3:]))
+            self.play(
+                Transform(result_entry, MathTex(answer, font_size=34).move_to(result_entry)),
+                Flash(result_box, color=GREEN),
+            )
+            self.play(FadeOut(VGroup(row_box, column_box, result_box, extracted, calculation)))
+
+        self.play(FadeOut(vector_product))
+        expanded.move_to(equation)
+        relation.next_to(expanded, DOWN, buff=0.5)
         self.play(Write(expanded))
         self.play(Write(relation))
         self.wait()

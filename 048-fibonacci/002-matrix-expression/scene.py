@@ -6,7 +6,11 @@ class FibonacciMatrixExpression(Scene):
 
     def construct(self):
         title = Text("行列とその掛け算", font_size=42, color=BLUE).to_edge(UP)
-        matrix = Matrix([[r"a_{11}", r"a_{12}"], [r"a_{21}", r"a_{22}"]]).scale(0.9).shift(UP * 0.8)
+        matrix = Matrix(
+            [[r"a_{11}", r"a_{12}"], [r"a_{21}", r"a_{22}"]],
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.9).shift(UP * 0.8)
         row_box = SurroundingRectangle(matrix.get_rows()[0], color=RED, buff=0.18)
         column_box = SurroundingRectangle(matrix.get_columns()[1], color=BLUE, buff=0.18)
         row_label = Text("行", color=RED, font_size=28).next_to(row_box, RIGHT)
@@ -22,12 +26,21 @@ class FibonacciMatrixExpression(Scene):
         left_matrix = Matrix(
             [[r"a_{11}", r"a_{12}"], [r"a_{21}", r"a_{22}"]],
             h_buff=1.25,
+            left_bracket="(",
+            right_bracket=")",
         ).scale(0.72)
         right_matrix = Matrix(
             [[r"b_{11}", r"b_{12}"], [r"b_{21}", r"b_{22}"]],
             h_buff=1.25,
+            left_bracket="(",
+            right_bracket=")",
         ).scale(0.72)
-        result_matrix = Matrix([[r"?", r"?"], [r"?", r"?"]], h_buff=1.65).scale(0.72)
+        result_matrix = Matrix(
+            [[r"?", r"?"], [r"?", r"?"]],
+            h_buff=3.8,
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.72)
         times = MathTex(r"\times", font_size=38)
         equals = MathTex(r"=", font_size=38)
         product = VGroup(left_matrix, times, right_matrix, equals, result_matrix).arrange(RIGHT, buff=0.35)

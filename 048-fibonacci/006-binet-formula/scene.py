@@ -75,6 +75,78 @@ class DeriveBinetFormula(Scene):
         self.wait()
 
         # 下書き14: 積を計算し、1行2列成分だけを取り出す。
+        self.play(FadeOut(product))
+        left_matrix = Matrix(
+            [[r"\alpha^{n+1}", r"\beta^{n+1}"], [r"\alpha^n", r"\beta^n"]],
+            h_buff=1.65,
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.62)
+        right_matrix = Matrix(
+            [["1", r"-\beta"], ["-1", r"\alpha"]],
+            h_buff=1.35,
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.62)
+        result_matrix = Matrix(
+            [["?", "?"], ["?", "?"]],
+            h_buff=4.2,
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.62)
+        animated_product = VGroup(
+            MathTex(r"A^n=\frac1{\sqrt5}", font_size=33),
+            left_matrix,
+            right_matrix,
+            MathTex("=", font_size=33),
+            result_matrix,
+        ).arrange(RIGHT, buff=0.25).next_to(definitions, DOWN, buff=0.45)
+        self.play(Write(animated_product))
+
+        calculations = [
+            (0, 0, r"\alpha^{n+1}", r"1", r"\beta^{n+1}", r"-1", r"\alpha^{n+1}-\beta^{n+1}"),
+            (0, 1, r"\alpha^{n+1}", r"-\beta", r"\beta^{n+1}", r"\alpha", r"-\beta\alpha^{n+1}+\alpha\beta^{n+1}"),
+            (1, 0, r"\alpha^n", r"1", r"\beta^n", r"-1", r"\alpha^n-\beta^n"),
+            (1, 1, r"\alpha^n", r"-\beta", r"\beta^n", r"\alpha", r"-\beta\alpha^n+\alpha\beta^n"),
+        ]
+        for row_index, column_index, left_1, right_1, left_2, right_2, answer in calculations:
+            row = left_matrix.get_rows()[row_index]
+            column = right_matrix.get_columns()[column_index]
+            result_entry = result_matrix.get_entries()[row_index * 2 + column_index]
+            row_box = SurroundingRectangle(row, color=RED, buff=0.1)
+            column_box = SurroundingRectangle(column, color=BLUE, buff=0.1)
+            result_box = SurroundingRectangle(result_entry, color=GREEN, buff=0.12)
+            self.play(Create(row_box), Create(column_box), Create(result_box))
+
+            extracted_row = row.copy().arrange(RIGHT, buff=0.3)
+            extracted_column = column.copy().arrange(DOWN, buff=0.15)
+            extracted = VGroup(
+                extracted_row,
+                MathTex(r"\cdot", font_size=30),
+                extracted_column,
+            ).arrange(RIGHT, buff=0.25).to_edge(DOWN, buff=0.65).shift(LEFT * 4.6)
+            self.play(
+                TransformFromCopy(row, extracted_row),
+                Write(extracted[1]),
+                TransformFromCopy(column, extracted_column),
+            )
+
+            calculation = MathTex(
+                left_1 + r"\cdot(" + right_1 + ")",
+                "+",
+                left_2 + r"\cdot(" + right_2 + ")",
+                "=",
+                answer,
+                font_size=26,
+            ).next_to(extracted, RIGHT, buff=0.35)
+            self.play(Write(calculation[:3]))
+            self.play(Write(calculation[3:]))
+            self.play(
+                Transform(result_entry, MathTex(answer, font_size=24).move_to(result_entry)),
+                Flash(result_box, color=GREEN),
+            )
+            self.play(FadeOut(VGroup(row_box, column_box, result_box, extracted, calculation)))
+
         expanded = MathTex(
             r"A^n=\frac1{\sqrt5}\begin{pmatrix}"
             r"\alpha^{n+1}-\beta^{n+1}&-\beta\alpha^{n+1}+\alpha\beta^{n+1}\\"
@@ -82,7 +154,7 @@ class DeriveBinetFormula(Scene):
             r"\end{pmatrix}",
             font_size=34,
         ).move_to(product)
-        self.play(ReplacementTransform(product, expanded))
+        self.play(FadeOut(animated_product), Write(expanded))
         self.wait()
 
         entry = MathTex(r"F_n=(A^n)_{1,2}=\frac{\alpha^n-\beta^n}{\sqrt5}", font_size=47)
