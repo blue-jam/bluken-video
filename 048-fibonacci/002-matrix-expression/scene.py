@@ -41,9 +41,8 @@ class FibonacciMatrixExpression(Scene):
             left_bracket="(",
             right_bracket=")",
         ).scale(0.72)
-        times = MathTex(r"\times", font_size=38)
         equals = MathTex(r"=", font_size=38)
-        product = VGroup(left_matrix, times, right_matrix, equals, result_matrix).arrange(RIGHT, buff=0.35)
+        product = VGroup(left_matrix, right_matrix, equals, result_matrix).arrange(RIGHT, buff=0.35)
         product.shift(UP * 0.7)
 
         guide = Text(
