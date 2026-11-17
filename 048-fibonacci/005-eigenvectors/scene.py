@@ -38,11 +38,12 @@ class FibonacciEigenvectors(Scene):
             right_bracket=")",
         ).scale(0.72)
         result_vector = Matrix(
-            [["?"], ["?"]],
+            [[r"x_1+x_2"], [r"x_1"]],
             h_buff=2.1,
             left_bracket="(",
             right_bracket=")",
         ).scale(0.72)
+        result_vector.get_entries().set_opacity(0)
         vector_product = VGroup(
             coefficient_matrix,
             vector,
@@ -52,10 +53,11 @@ class FibonacciEigenvectors(Scene):
         self.play(Write(vector_product))
 
         vector_calculations = [
-            (0, r"1\cdot x_1", r"1\cdot x_2", r"x_1+x_2"),
-            (1, r"1\cdot x_1", r"0\cdot x_2", r"x_1"),
+            (0, "1", r"x_1", "1", r"x_2", r"x_1+x_2"),
+            (1, "1", r"x_1", "0", r"x_2", r"x_1"),
         ]
-        for row_index, first_product, second_product, answer in vector_calculations:
+        displayed_answers = VGroup()
+        for row_index, first_a, first_b, second_a, second_b, answer in vector_calculations:
             row = coefficient_matrix.get_rows()[row_index]
             column = vector.get_columns()[0]
             result_entry = result_vector.get_entries()[row_index]
@@ -64,36 +66,56 @@ class FibonacciEigenvectors(Scene):
             result_box = SurroundingRectangle(result_entry, color=GREEN, buff=0.14)
             self.play(Create(row_box), Create(column_box), Create(result_box))
 
-            extracted_row = row.copy().arrange(RIGHT, buff=0.35)
-            extracted_column = column.copy().arrange(DOWN, buff=0.18)
-            extracted = VGroup(
-                extracted_row,
-                MathTex(r"\cdot"),
-                extracted_column,
-            ).arrange(RIGHT, buff=0.3).to_edge(DOWN, buff=0.7).shift(LEFT * 3.5)
-            self.play(
-                TransformFromCopy(row, extracted_row),
-                Write(extracted[1]),
-                TransformFromCopy(column, extracted_column),
-            )
-
-            calculation = MathTex(
-                first_product,
+            expression_layout = MathTex(
+                first_a,
+                first_b,
                 "+",
-                second_product,
+                second_a,
+                second_b,
                 "=",
                 answer,
                 font_size=33,
-            ).next_to(extracted, RIGHT, buff=0.5)
-            self.play(Write(calculation[:3]))
-            self.play(Write(calculation[3:]))
+            ).to_edge(DOWN, buff=0.7)
+            row_terms = VGroup(
+                MathTex(first_a, font_size=33).move_to(expression_layout[0]),
+                MathTex(second_a, font_size=33).move_to(expression_layout[3]),
+            )
+            column_terms = VGroup(
+                MathTex(first_b, font_size=33).move_to(expression_layout[1]),
+                MathTex(second_b, font_size=33).move_to(expression_layout[4]),
+            )
+            plus = expression_layout[2].copy()
             self.play(
-                Transform(result_entry, MathTex(answer, font_size=34).move_to(result_entry)),
+                TransformFromCopy(row[0], row_terms[0]),
+                TransformFromCopy(row[1], row_terms[1]),
+                TransformFromCopy(column[0], column_terms[0]),
+                TransformFromCopy(column[1], column_terms[1]),
+                Write(plus),
+            )
+            equals_and_answer = VGroup(expression_layout[5].copy(), expression_layout[6].copy())
+            self.play(Write(equals_and_answer))
+
+            answer_in_matrix = result_entry.copy().set_opacity(1)
+            self.play(
+                TransformFromCopy(equals_and_answer[1], answer_in_matrix),
                 Flash(result_box, color=GREEN),
             )
-            self.play(FadeOut(VGroup(row_box, column_box, result_box, extracted, calculation)))
+            displayed_answers.add(answer_in_matrix)
+            self.play(
+                FadeOut(
+                    VGroup(
+                        row_box,
+                        column_box,
+                        result_box,
+                        row_terms,
+                        column_terms,
+                        plus,
+                        equals_and_answer,
+                    )
+                )
+            )
 
-        self.play(FadeOut(vector_product))
+        self.play(FadeOut(VGroup(vector_product, displayed_answers)))
         expanded.move_to(equation)
         relation.next_to(expanded, DOWN, buff=0.5)
         self.play(Write(expanded))

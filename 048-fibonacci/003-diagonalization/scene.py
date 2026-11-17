@@ -41,11 +41,12 @@ class DiagonalizationIdea(Scene):
             right_bracket=")",
         ).scale(0.68)
         square_result = Matrix(
-            [["?", "?"], ["?", "?"]],
+            [[r"\lambda_1^2", "0"], ["0", r"\lambda_2^2"]],
             h_buff=2.2,
             left_bracket="(",
             right_bracket=")",
         ).scale(0.68)
+        square_result.get_entries().set_opacity(0)
         square = VGroup(
             diagonal_left,
             diagonal_right,
@@ -60,12 +61,13 @@ class DiagonalizationIdea(Scene):
         self.play(Write(square))  # 下書き6・①
 
         square_calculations = [
-            (0, 0, r"\lambda_1\cdot\lambda_1", r"0\cdot0", r"\lambda_1^2"),
-            (0, 1, r"\lambda_1\cdot0", r"0\cdot\lambda_2", "0"),
-            (1, 0, r"0\cdot\lambda_1", r"\lambda_2\cdot0", "0"),
-            (1, 1, r"0\cdot0", r"\lambda_2\cdot\lambda_2", r"\lambda_2^2"),
+            (0, 0, r"\lambda_1", r"\lambda_1", "0", "0", r"\lambda_1^2"),
+            (0, 1, r"\lambda_1", "0", "0", r"\lambda_2", "0"),
+            (1, 0, "0", r"\lambda_1", r"\lambda_2", "0", "0"),
+            (1, 1, "0", "0", r"\lambda_2", r"\lambda_2", r"\lambda_2^2"),
         ]
-        for row_index, column_index, first_product, second_product, answer in square_calculations:
+        displayed_answers = VGroup()
+        for row_index, column_index, first_a, first_b, second_a, second_b, answer in square_calculations:
             row = diagonal_left.get_rows()[row_index]
             column = diagonal_right.get_columns()[column_index]
             result_entry = square_result.get_entries()[row_index * 2 + column_index]
@@ -74,25 +76,54 @@ class DiagonalizationIdea(Scene):
             result_box = SurroundingRectangle(result_entry, color=GREEN, buff=0.12)
             self.play(Create(row_box), Create(column_box), Create(result_box))
 
-            calculation = MathTex(
-                first_product,
+            expression_layout = MathTex(
+                first_a,
+                first_b,
                 "+",
-                second_product,
+                second_a,
+                second_b,
                 "=",
                 answer,
                 font_size=31,
             ).to_edge(DOWN, buff=0.45)
-            self.play(
-                TransformFromCopy(row, calculation[0]),
-                Write(calculation[1]),
-                TransformFromCopy(column, calculation[2]),
+            row_terms = VGroup(
+                MathTex(first_a, font_size=31).move_to(expression_layout[0]),
+                MathTex(second_a, font_size=31).move_to(expression_layout[3]),
             )
-            self.play(Write(calculation[3:]))
+            column_terms = VGroup(
+                MathTex(first_b, font_size=31).move_to(expression_layout[1]),
+                MathTex(second_b, font_size=31).move_to(expression_layout[4]),
+            )
+            plus = expression_layout[2].copy()
             self.play(
-                Transform(result_entry, MathTex(answer, font_size=32).move_to(result_entry)),
+                TransformFromCopy(row[0], row_terms[0]),
+                TransformFromCopy(row[1], row_terms[1]),
+                TransformFromCopy(column[0], column_terms[0]),
+                TransformFromCopy(column[1], column_terms[1]),
+                Write(plus),
+            )
+            equals_and_answer = VGroup(expression_layout[5].copy(), expression_layout[6].copy())
+            self.play(Write(equals_and_answer))
+
+            answer_in_matrix = result_entry.copy().set_opacity(1)
+            self.play(
+                TransformFromCopy(equals_and_answer[1], answer_in_matrix),
                 Flash(result_box, color=GREEN),
             )
-            self.play(FadeOut(VGroup(row_box, column_box, result_box, calculation)))
+            displayed_answers.add(answer_in_matrix)
+            self.play(
+                FadeOut(
+                    VGroup(
+                        row_box,
+                        column_box,
+                        result_box,
+                        row_terms,
+                        column_terms,
+                        plus,
+                        equals_and_answer,
+                    )
+                )
+            )
 
         self.play(Write(general))  # 下書き6・②
         self.wait(2)

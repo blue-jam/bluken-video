@@ -89,11 +89,15 @@ class DeriveBinetFormula(Scene):
             right_bracket=")",
         ).scale(0.62)
         result_matrix = Matrix(
-            [["?", "?"], ["?", "?"]],
+            [
+                [r"\alpha^{n+1}-\beta^{n+1}", r"-\beta\alpha^{n+1}+\alpha\beta^{n+1}"],
+                [r"\alpha^n-\beta^n", r"-\beta\alpha^n+\alpha\beta^n"],
+            ],
             h_buff=4.2,
             left_bracket="(",
             right_bracket=")",
         ).scale(0.62)
+        result_matrix.get_entries().set_opacity(0)
         animated_product = VGroup(
             MathTex(r"A^n=\frac1{\sqrt5}", font_size=33),
             left_matrix,
@@ -109,6 +113,7 @@ class DeriveBinetFormula(Scene):
             (1, 0, r"\alpha^n", r"1", r"\beta^n", r"-1", r"\alpha^n-\beta^n"),
             (1, 1, r"\alpha^n", r"-\beta", r"\beta^n", r"\alpha", r"-\beta\alpha^n+\alpha\beta^n"),
         ]
+        displayed_answers = VGroup()
         for row_index, column_index, left_1, right_1, left_2, right_2, answer in calculations:
             row = left_matrix.get_rows()[row_index]
             column = right_matrix.get_columns()[column_index]
@@ -118,34 +123,54 @@ class DeriveBinetFormula(Scene):
             result_box = SurroundingRectangle(result_entry, color=GREEN, buff=0.12)
             self.play(Create(row_box), Create(column_box), Create(result_box))
 
-            extracted_row = row.copy().arrange(RIGHT, buff=0.3)
-            extracted_column = column.copy().arrange(DOWN, buff=0.15)
-            extracted = VGroup(
-                extracted_row,
-                MathTex(r"\cdot", font_size=30),
-                extracted_column,
-            ).arrange(RIGHT, buff=0.25).to_edge(DOWN, buff=0.65).shift(LEFT * 4.6)
-            self.play(
-                TransformFromCopy(row, extracted_row),
-                Write(extracted[1]),
-                TransformFromCopy(column, extracted_column),
-            )
-
-            calculation = MathTex(
-                left_1 + r"\cdot(" + right_1 + ")",
+            expression_layout = MathTex(
+                left_1,
+                rf"\left({right_1}\right)",
                 "+",
-                left_2 + r"\cdot(" + right_2 + ")",
+                left_2,
+                rf"\left({right_2}\right)",
                 "=",
                 answer,
-                font_size=26,
-            ).next_to(extracted, RIGHT, buff=0.35)
-            self.play(Write(calculation[:3]))
-            self.play(Write(calculation[3:]))
+                font_size=25,
+            ).to_edge(DOWN, buff=0.55)
+            row_terms = VGroup(
+                MathTex(left_1, font_size=25).move_to(expression_layout[0]),
+                MathTex(left_2, font_size=25).move_to(expression_layout[3]),
+            )
+            column_terms = VGroup(
+                MathTex(rf"\left({right_1}\right)", font_size=25).move_to(expression_layout[1]),
+                MathTex(rf"\left({right_2}\right)", font_size=25).move_to(expression_layout[4]),
+            )
+            plus = expression_layout[2].copy()
             self.play(
-                Transform(result_entry, MathTex(answer, font_size=24).move_to(result_entry)),
+                TransformFromCopy(row[0], row_terms[0]),
+                TransformFromCopy(row[1], row_terms[1]),
+                TransformFromCopy(column[0], column_terms[0]),
+                TransformFromCopy(column[1], column_terms[1]),
+                Write(plus),
+            )
+            equals_and_answer = VGroup(expression_layout[5].copy(), expression_layout[6].copy())
+            self.play(Write(equals_and_answer))
+
+            answer_in_matrix = result_entry.copy().set_opacity(1)
+            self.play(
+                TransformFromCopy(equals_and_answer[1], answer_in_matrix),
                 Flash(result_box, color=GREEN),
             )
-            self.play(FadeOut(VGroup(row_box, column_box, result_box, extracted, calculation)))
+            displayed_answers.add(answer_in_matrix)
+            self.play(
+                FadeOut(
+                    VGroup(
+                        row_box,
+                        column_box,
+                        result_box,
+                        row_terms,
+                        column_terms,
+                        plus,
+                        equals_and_answer,
+                    )
+                )
+            )
 
         expanded = MathTex(
             r"A^n=\frac1{\sqrt5}\begin{pmatrix}"
@@ -154,7 +179,7 @@ class DeriveBinetFormula(Scene):
             r"\end{pmatrix}",
             font_size=34,
         ).move_to(product)
-        self.play(FadeOut(animated_product), Write(expanded))
+        self.play(FadeOut(VGroup(animated_product, displayed_answers)), Write(expanded))
         self.wait()
 
         entry = MathTex(r"F_n=(A^n)_{1,2}=\frac{\alpha^n-\beta^n}{\sqrt5}", font_size=47)
