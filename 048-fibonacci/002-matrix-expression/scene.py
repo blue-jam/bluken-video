@@ -82,8 +82,6 @@ class FibonacciMatrixExpression(Scene):
                 "+",
                 second_a,
                 second_b,
-                "=",
-                first_a + first_b + "+" + second_a + second_b,
                 font_size=31,
             ).to_edge(DOWN, buff=0.8)
             row_terms = VGroup(
@@ -107,15 +105,10 @@ class FibonacciMatrixExpression(Scene):
             plus = expression_layout[2].copy()
             self.play(Write(plus))
 
-            equals_and_answer = VGroup(
-                expression_layout[5].copy(),
-                expression_layout[6].copy(),
-            )
-            self.play(Write(equals_and_answer))
-
             answer_in_matrix = result_entry.copy().set_opacity(1)
+            calculation = VGroup(row_terms, column_terms, plus)
             self.play(
-                TransformFromCopy(equals_and_answer[1], answer_in_matrix),
+                TransformFromCopy(calculation, answer_in_matrix),
                 Flash(result_box, color=GREEN),
             )
             displayed_answers.add(answer_in_matrix)
@@ -129,7 +122,6 @@ class FibonacciMatrixExpression(Scene):
                         row_terms,
                         column_terms,
                         plus,
-                        equals_and_answer,
                     )
                 ),
             )
