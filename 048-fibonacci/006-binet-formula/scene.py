@@ -13,23 +13,108 @@ class DeriveBinetFormula(Scene):
         )
         givens = VGroup(a_matrix, p_matrix).arrange(RIGHT, buff=1.0).next_to(title, DOWN, buff=0.4)
 
-        inverse_rule = MathTex(
-            r"\begin{pmatrix}a&b\\c&d\end{pmatrix}^{-1}="
-            r"\frac1{ad-bc}\begin{pmatrix}d&-b\\-c&a\end{pmatrix}",
-            font_size=39,
-        ).next_to(givens, DOWN, buff=0.55)
+        self.play(Write(title), Write(givens))
+        # A=(a b; c d) に右肩の -1 を付けるのと同時に、逆行列の形へ変形する。
+        general_label = MathTex("A", "=", font_size=44)
+        general_matrix = Matrix(
+            [["a", "b"], ["c", "d"]], left_bracket="(", right_bracket=")"
+        ).scale(0.9)
+        general_expression = VGroup(general_label, general_matrix).arrange(RIGHT, buff=0.2)
+        general_expression.next_to(givens, DOWN, buff=0.65)
+        self.play(Write(general_label), Write(general_matrix))
+        self.wait(0.4)
+
+        inverse_label = MathTex("A", "=", font_size=44)
+        inverse_power = MathTex("-1", font_size=25)
+        inverse_factor = MathTex(r"\frac1{ad-bc}", font_size=42)
+        general_result_matrix = Matrix(
+            [["d", "-b"], ["-c", "a"]], left_bracket="(", right_bracket=")"
+        ).scale(0.9)
+        inverse_expression = VGroup(
+            inverse_label, inverse_factor, general_result_matrix
+        ).arrange(RIGHT, buff=0.2)
+        inverse_expression.next_to(givens, DOWN, buff=0.65)
+        inverse_power.next_to(inverse_label[0], UR, buff=0.02)
+
+        source_entries = general_matrix.get_entries()
+        result_entries = general_result_matrix.get_entries()
+        self.play(
+            ReplacementTransform(general_label[0], inverse_label[0]),
+            ReplacementTransform(general_label[1], inverse_label[1]),
+            Write(inverse_power),
+            GrowFromCenter(inverse_factor),
+            ReplacementTransform(general_matrix.get_brackets(), general_result_matrix.get_brackets()),
+            ReplacementTransform(source_entries[0], result_entries[3], path_arc=-PI / 2),
+            ReplacementTransform(source_entries[3], result_entries[0], path_arc=-PI / 2),
+            ReplacementTransform(source_entries[1], result_entries[1]),
+            ReplacementTransform(source_entries[2], result_entries[2]),
+            run_time=2.2,
+        )
+        self.play(Circumscribe(VGroup(inverse_label, inverse_power, inverse_factor, general_result_matrix), color=GREEN))
+        self.play(FadeOut(VGroup(
+            inverse_label, inverse_power, inverse_factor, general_result_matrix
+        )))
+
+        source_label = MathTex("P", "=", font_size=42)
+        source_matrix = Matrix(
+            [[r"\frac{1+\sqrt5}{2}", r"\frac{1-\sqrt5}{2}"], ["1", "1"]],
+            h_buff=2.15,
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.72)
+        source_group = VGroup(source_label, source_matrix).arrange(RIGHT, buff=0.2)
+        source_group.next_to(givens, DOWN, buff=0.45)
+
+        self.play(Write(source_label), Write(source_matrix))
+        source_entries = source_matrix.get_entries()
+
+        p_inverse_label = MathTex("P", "=", font_size=42)
+        p_inverse_power = MathTex("-1", font_size=24)
+        p_inverse_factor = MathTex(r"\frac1{\sqrt5}", font_size=40)
+        inverse_matrix = Matrix(
+            [["1", r"-\frac{1-\sqrt5}{2}"], ["-1", r"\frac{1+\sqrt5}{2}"]],
+            h_buff=2.15,
+            left_bracket="(",
+            right_bracket=")",
+        ).scale(0.72)
+        inverse_parts = VGroup(
+            p_inverse_label, p_inverse_factor, inverse_matrix
+        ).arrange(RIGHT, buff=0.2)
+        inverse_parts.next_to(givens, DOWN, buff=0.45)
+        p_inverse_power.next_to(p_inverse_label[0], UR, buff=0.02)
+        target_entries = inverse_matrix.get_entries()
+
+        self.play(
+            ReplacementTransform(source_label[0], p_inverse_label[0]),
+            ReplacementTransform(source_label[1], p_inverse_label[1]),
+            Write(p_inverse_power),
+            GrowFromCenter(p_inverse_factor),
+            ReplacementTransform(source_matrix.get_brackets(), inverse_matrix.get_brackets()),
+            ReplacementTransform(source_entries[0], target_entries[3], path_arc=-PI / 2),
+            ReplacementTransform(source_entries[3], target_entries[0], path_arc=-PI / 2),
+            ReplacementTransform(source_entries[1], target_entries[1]),
+            ReplacementTransform(source_entries[2], target_entries[2]),
+            run_time=2.2,
+        )
+        self.play(Circumscribe(
+            VGroup(p_inverse_label, p_inverse_power, p_inverse_factor, inverse_matrix),
+            color=GREEN,
+        ))
+
         inverse = MathTex(
             r"P^{-1}=\frac1{\sqrt5}"
             r"\begin{pmatrix}1&-\frac{1-\sqrt5}{2}\\-1&\frac{1+\sqrt5}{2}\end{pmatrix}",
             font_size=42,
-        ).next_to(inverse_rule, DOWN, buff=0.65)
-        self.play(Write(title), Write(givens))
-        self.play(Write(inverse_rule))
-        self.play(Write(inverse))
+        ).move_to(inverse_parts)
+        self.play(
+            ReplacementTransform(
+                VGroup(p_inverse_label, p_inverse_power, p_inverse_factor, inverse_matrix), inverse
+            ),
+        )
         self.wait()
 
         # 同じ「対角化」の下書き12。前の計算を消して、同時表示量を抑える。
-        self.play(FadeOut(inverse_rule), inverse.animate.next_to(givens, DOWN, buff=0.45).scale(0.88))
+        self.play(inverse.animate.next_to(givens, DOWN, buff=0.45).scale(0.88))
         diagonal = MathTex(
             r"P^{-1}AP=\begin{pmatrix}\frac{1+\sqrt5}{2}&0\\0&\frac{1-\sqrt5}{2}\end{pmatrix}",
             font_size=40,
