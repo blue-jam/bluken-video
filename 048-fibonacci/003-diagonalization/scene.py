@@ -27,7 +27,10 @@ class DiagonalizationIdea(Scene):
         ).arrange(RIGHT, buff=0.08).next_to(equation, RIGHT, buff=0.5)
         diagonal_box = SurroundingRectangle(equation[1], color=RED, buff=0.12)
         diagonal_label = Text("対角行列", font_size=28, color=RED).next_to(diagonal_box, DOWN)
-        inverse = MathTex(r"P^{-1}P=PP^{-1}=\begin{pmatrix}1&0\\0&1\end{pmatrix}", font_size=39)
+        inverse = MathTex(
+            r"P^{-1}P=PP^{-1}=\begin{pmatrix}1&0\\0&1\end{pmatrix}=E",
+            font_size=39,
+        )
         inverse.next_to(equation, DOWN, buff=1.0)
         self.play(Write(title), Write(definition))
         self.play(Write(equation), Write(lambda_note), Create(diagonal_box), Write(diagonal_label))

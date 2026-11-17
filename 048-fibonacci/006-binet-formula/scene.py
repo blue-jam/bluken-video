@@ -119,38 +119,96 @@ class DeriveBinetFormula(Scene):
             r"P^{-1}AP=\begin{pmatrix}\lambda_1&0\\0&\lambda_2\end{pmatrix}",
             font_size=40,
         ).next_to(top_row, DOWN, buff=0.45)
-        power_identity = MathTex(
-            r"(P^{-1}AP)^n=P^{-1}A^nP",
-            font_size=39,
-        ).next_to(diagonal, DOWN, buff=0.45)
-        diagonal_power = MathTex(
-            r"P^{-1}A^nP="
-            r"\begin{pmatrix}"
-            r"\lambda_1^n&0\\"
-            r"0&\lambda_2^n"
-            r"\end{pmatrix}",
-            font_size=38,
-        ).next_to(power_identity, DOWN, buff=0.4)
         self.play(Write(diagonal))
-        self.play(Write(power_identity))
-        self.play(Write(diagonal_power))
+
+        # (P^{-1}AP) を n 個並べ、境目の PP^{-1} が消える様子を見せる。
+        # 下書き12の横長な式を2段に分け、打ち消す箇所を色で追いやすくする。
+        self.play(FadeOut(VGroup(givens, inverse)))
+        self.play(diagonal.animate.next_to(title, DOWN, buff=0.55))
+
+        power_lhs_shift = DOWN * 0 + LEFT * 4.0
+        power_lhs = MathTex(
+            r"(P^{-1}AP)^n", "=", font_size=39,
+        )
+        power_lhs.next_to(diagonal, DOWN, buff=0.55)
+        power_lhs.shift(power_lhs_shift)
+        repeated_rhs_offset = DOWN * 0.3 + RIGHT * 0.0
+        repeated_rhs = MathTex(
+            r"\underbrace{(P^{-1}AP)(P^{-1}AP)\cdots(P^{-1}AP)}_{n}",
+            font_size=39,
+        ).next_to(power_lhs, RIGHT, buff=0.18)
+        repeated_rhs.shift(repeated_rhs_offset)
+        self.play(Write(power_lhs))
+        self.play(Write(repeated_rhs), run_time=1.8)
+
+        cancellation_product = MathTex(
+            "=", r"P^{-1}", "A", "P", r"P^{-1}", "A",
+            r"\cdots", "A", "P", r"P^{-1}", "A", "P",
+            font_size=39,
+        ).next_to(repeated_rhs, DOWN, buff=0.5)
+        cancellation_product.set_color_by_tex("P", BLUE)
+        cancellation_product.set_color_by_tex("A", YELLOW)
+        self.play(Write(cancellation_product))
+
+        # 代表として両端の境目を囲む。途中のすべての境目でも同じことが起きる。
+        left_pair = VGroup(cancellation_product[3], cancellation_product[4])
+        right_pair = VGroup(cancellation_product[8], cancellation_product[9])
+        left_box = SurroundingRectangle(left_pair, color=RED, buff=0.09)
+        right_box = SurroundingRectangle(right_pair, color=RED, buff=0.09)
+        identity_left = MathTex("E", font_size=34, color=GREEN).move_to(left_pair)
+        identity_right = MathTex("E", font_size=34, color=GREEN).move_to(right_pair)
+        self.play(Create(left_box), Create(right_box))
+        self.play(
+            FadeOut(left_pair),
+            FadeOut(right_pair),
+            FadeIn(identity_left),
+            FadeIn(identity_right),
+        )
+
+        collapsed_rhs_offset = DOWN * 0.1 + RIGHT * 0.0
+        collapsed_rhs = MathTex(
+            r"P^{-1}",
+            r"\underbrace{A A\cdots A}_{n}",
+            "P",
+            "=",
+            r"P^{-1}A^nP",
+            "=",
+            r"\begin{pmatrix}\lambda_1^n&0\\0&\lambda_2^n\end{pmatrix}",
+            font_size=36,
+        ).next_to(power_lhs, RIGHT, buff=0.18)
+        collapsed_rhs.shift(collapsed_rhs_offset)
+        collapsed_rhs.set_color_by_tex("P", BLUE)
+        collapsed_rhs.set_color_by_tex("A", YELLOW)
+        self.play(
+            FadeOut(VGroup(left_box, right_box, identity_left, identity_right, cancellation_product)),
+            ReplacementTransform(repeated_rhs, collapsed_rhs[0:3]),
+        )
+
+        self.play(Write(collapsed_rhs[3:]), run_time=1.2)
+        power_identity = VGroup(power_lhs, collapsed_rhs)
         self.wait()
 
         # 下書き13: A^n=P D^n P^{-1} を展開する。
-        self.play(FadeOut(VGroup(givens, inverse, diagonal, power_identity, diagonal_power)))
+        self.play(FadeOut(VGroup(diagonal, power_identity)))
         title2 = Text("公式を導く", font_size=42, color=BLUE).to_edge(UP)
+        givens2 = VGroup(
+            a_matrix, p_matrix, MathTex(r"P^{-1}=\begin{pmatrix}1&\lambda_2\\-1&\lambda_1\end{pmatrix}")
+        ).arrange(RIGHT, buff=1.0).next_to(title2, DOWN, buff=0.4)
         relation = MathTex(
             r"A^n=P"
             r"\begin{pmatrix}\lambda_1^n&0\\0&\lambda_2^n\end{pmatrix}P^{-1}",
             font_size=48,
-        ).next_to(title2, DOWN, buff=0.5)
+        ).next_to(givens2, DOWN, buff=0.5)
         product = MathTex(
             r"A^n=\frac1{\lambda_1-\lambda_2}"
             r"\begin{pmatrix}\lambda_1^{n+1}&\lambda_2^{n+1}\\\lambda_1^n&\lambda_2^n\end{pmatrix}"
             r"\begin{pmatrix}1&-\lambda_2\\-1&\lambda_1\end{pmatrix}",
             font_size=41,
         ).next_to(relation, DOWN, buff=0.65)
-        self.play(ReplacementTransform(title, title2))
+        self.play(
+            ReplacementTransform(title, title2),
+            Write(givens2)
+        )
         self.play(Write(relation))
         self.play(Write(product))
         self.wait()
