@@ -8,25 +8,26 @@ class FibonacciEigenvectors(Scene):
         title = Text("固有ベクトルを求める", font_size=42, color=BLUE).to_edge(UP)
         known = MathTex(
             r"A=\begin{pmatrix}1&1\\1&0\end{pmatrix},\qquad"
-            r"\lambda=\frac{1\pm\sqrt5}{2}",
+            r"\lambda=\frac{1\pm\sqrt5}{2},\qquad"
+            r"\boldsymbol{x}=\begin{pmatrix}x_1 \\ x_2\end{pmatrix}",
             font_size=39,
         ).next_to(title, DOWN, buff=0.4)
+        orig_eq = MathTex(
+            r"A \boldsymbol{x} = \lambda \boldsymbol{x}"
+        ).next_to(known, DOWN, buff=0.70)
+        self.play(Write(title), Write(known))
+        self.play(Write(orig_eq))
+        self.wait()
+
         equation = MathTex(
             r"\begin{pmatrix}1&1\\1&0\end{pmatrix}"
             r"\begin{pmatrix}x_1\\x_2\end{pmatrix}="
             r"\frac{1\pm\sqrt5}{2}\begin{pmatrix}x_1\\x_2\end{pmatrix}",
             font_size=41,
-        ).next_to(known, DOWN, buff=0.55)
-        expanded = MathTex(
-            r"\begin{pmatrix}x_1+x_2\\x_1\end{pmatrix}="
-            r"\begin{pmatrix}\frac{1\pm\sqrt5}{2}x_1\\\frac{1\pm\sqrt5}{2}x_2\end{pmatrix}",
-            font_size=40,
-        ).next_to(equation, DOWN, buff=0.5)
-        relation = MathTex(r"x_1=\frac{1\pm\sqrt5}{2}x_2", font_size=41).next_to(expanded, DOWN, buff=0.5)
-        self.play(Write(title), Write(known))
-        self.play(Write(equation))
+        ).move_to(orig_eq)
+        self.play(ReplacementTransform(orig_eq, equation))
+        self.wait()
 
-        self.play(FadeOut(equation))
         coefficient_matrix = Matrix(
             [["1", "1"], ["1", "0"]],
             left_bracket="(",
@@ -49,7 +50,7 @@ class FibonacciEigenvectors(Scene):
             vector,
             MathTex("="),
             result_vector,
-        ).arrange(RIGHT, buff=0.4).move_to(equation)
+        ).arrange(RIGHT, buff=0.4).next_to(equation, DOWN, buff=0.55)
         self.play(Write(vector_product))
 
         vector_calculations = [
@@ -115,10 +116,14 @@ class FibonacciEigenvectors(Scene):
                 )
             )
 
-        self.play(FadeOut(VGroup(vector_product, displayed_answers)))
-        expanded.move_to(equation)
+        expanded = MathTex(
+            r"\begin{pmatrix}x_1+x_2\\x_1\end{pmatrix}="
+            r"\begin{pmatrix}\frac{1\pm\sqrt5}{2}x_1\\\frac{1\pm\sqrt5}{2}x_2\end{pmatrix}",
+            font_size=40,
+        ).move_to(equation)
+        relation = MathTex(r"x_1=\frac{1\pm\sqrt5}{2}x_2", font_size=41).next_to(expanded, DOWN, buff=0.5)
         relation.next_to(expanded, DOWN, buff=0.5)
-        self.play(Write(expanded))
+        self.play(ReplacementTransform(VGroup(equation, vector_product, displayed_answers), expanded))
         self.play(Write(relation))
         self.wait()
 

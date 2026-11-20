@@ -14,8 +14,8 @@ class DeriveBinetFormula(Scene):
         givens = VGroup(a_matrix, p_matrix).arrange(RIGHT, buff=1.0).next_to(title, DOWN, buff=0.4)
 
         self.play(Write(title), Write(givens))
-        # A=(a b; c d) に右肩の -1 を付けるのと同時に、逆行列の形へ変形する。
-        general_label = MathTex("A", "=", font_size=44)
+        # B=(a b; c d) に右肩の -1 を付けるのと同時に、逆行列の形へ変形する。
+        general_label = MathTex("B", "=", font_size=44)
         general_matrix = Matrix(
             [["a", "b"], ["c", "d"]], left_bracket="(", right_bracket=")"
         ).scale(0.9)
@@ -24,7 +24,7 @@ class DeriveBinetFormula(Scene):
         self.play(Write(general_label), Write(general_matrix))
         self.wait(0.4)
 
-        inverse_label = MathTex("A", "=", font_size=44)
+        inverse_label = MathTex("B", "=", font_size=44)
         inverse_power = MathTex("-1", font_size=25)
         inverse_factor = MathTex(r"\frac1{ad-bc}", font_size=42)
         general_result_matrix = Matrix(
