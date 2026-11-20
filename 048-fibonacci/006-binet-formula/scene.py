@@ -413,7 +413,8 @@ class DeriveBinetFormula(Scene):
             r"A^n=\frac1{\lambda_1-\lambda_2}\begin{pmatrix}"
             r"\lambda_1^{n+1}-\lambda_2^{n+1}&-\lambda_2\lambda_1^{n+1}+\lambda_1\lambda_2^{n+1}\\"
             r"\lambda_1^n-\lambda_2^n&-\lambda_2\lambda_1^n+\lambda_1\lambda_2^n"
-            r"\end{pmatrix}",
+            r"\end{pmatrix}"
+            r"=\begin{pmatrix} F_{n+1} & F_n \\ F_n & F_{n-1}\end{pmatrix}",
             font_size=34,
         ).next_to(title2, DOWN, buff=0.55)
         self.play(

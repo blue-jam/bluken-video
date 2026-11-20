@@ -2,7 +2,7 @@ from manim import *
 
 
 class FibonacciMatrixExpression(Scene):
-    """行列積の仕組みを示し、フィボナッチ行列を3乗まで計算する。"""
+    """行列積の仕組みを示し、フィボナッチ行列を4乗まで計算する。"""
 
     def construct(self):
         title = Text("行列とその掛け算", font_size=42, color=BLUE).to_edge(UP)
@@ -150,7 +150,7 @@ class FibonacciMatrixExpression(Scene):
             equation.next_to(obj, DOWN, buff=0.55)
 
             self.play(Write(power_label))
-            # A^2 を A・A に、A^3 を A・A^2 に分ける段階を明示する。
+            # A^2 を A・A に、A^4 を A^2・A^2 に分ける段階を明示する。
             self.play(Write(left), Write(right), Write(equals), Write(result.get_brackets()))
 
             answers = VGroup()
@@ -239,5 +239,5 @@ class FibonacciMatrixExpression(Scene):
             return VGroup(equation, answers)
 
         square = animate_numeric_product(identity, 2, [[1, 1], [1, 0]], [[1, 1], [1, 0]], [[2, 1], [1, 1]])
-        animate_numeric_product(square, 3, [[1, 1], [1, 0]], [[2, 1], [1, 1]], [[3, 2], [2, 1]])
+        animate_numeric_product(square, 4, [[2, 1], [1, 1]], [[2, 1], [1, 1]], [[5, 3], [3, 2]])
         self.wait(2)
