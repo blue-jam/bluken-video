@@ -14,7 +14,7 @@ class FibonacciGrowthSummary(Scene):
 
         self.play(Write(title))
         self.play(FadeIn(main_summary, shift=UP * 0.25))
-        self.wait(2)
+        self.wait(10)
 
         other_methods_title = Text(
             "一般項を導く、ほかの方法", font_size=34, color=YELLOW
@@ -46,7 +46,7 @@ class FibonacciGrowthSummary(Scene):
                 lag_ratio=0.35,
             )
         )
-        self.wait(2)
+        self.wait(30)
 
         self.play(FadeOut(VGroup(other_methods_title, methods)))
 
@@ -58,7 +58,7 @@ class FibonacciGrowthSummary(Scene):
             ),
         ).move_to(ORIGIN)
         self.play(Write(closing))
-        self.wait(3)
+        self.wait(10)
 
     @staticmethod
     def _method_row(method, source):

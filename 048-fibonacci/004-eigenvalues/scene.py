@@ -23,13 +23,14 @@ class FibonacciEigenvalues(Scene):
             VGroup(MathTex(r"\boldsymbol{x}:", color=GREEN), Text("固有ベクトル", font_size=28, color=GREEN)).arrange(RIGHT, buff=0.12),
         ).arrange(RIGHT, buff=1.2).next_to(definition, DOWN, buff=0.55)
         self.play(Write(title))
+        self.wait(20)
         self.play(Write(conditions), Write(definition), Write(labels))  # 下書き7・①
-        self.wait()
+        self.wait(20)
 
         general = MathTex(r"A=\begin{pmatrix}a&b\\c&d\end{pmatrix}", font_size=42).next_to(labels, DOWN, buff=0.55)
         characteristic = MathTex(r"(\lambda-a)(\lambda-d)-bc=0", font_size=42).next_to(general, DOWN, buff=0.4)
         self.play(Write(general), Write(characteristic))  # 下書き7・②
-        self.wait()
+        self.wait(20)
 
         self.play(FadeOut(VGroup(conditions, definition, labels, general, characteristic)))
         subtitle = Text("固有値を求める", font_size=32).next_to(title, DOWN, buff=0.4)
@@ -40,7 +41,10 @@ class FibonacciEigenvalues(Scene):
             VGroup(MathTex(r"\lambda=\frac{-(-1)\pm\sqrt{(-1)^2-4\cdot 1 \cdot (-1)}}{2\cdot 1}="), MathTex(r"\frac{1\pm\sqrt5}{2}")).arrange(RIGHT)
         ).arrange(DOWN, buff=0.48).scale(0.95).next_to(subtitle, DOWN, buff=0.45)
         self.play(Write(subtitle), Write(lines[0]))
-        for line in lines[1:]:
+        self.wait(20)
+        for line in lines[1:-1]:
             self.play(Write(line))
+        self.wait(20)
+        self.play(Write(lines[-1]))
         self.play(Circumscribe(lines[-1][-1], color=YELLOW))
-        self.wait(2)
+        self.wait(20)

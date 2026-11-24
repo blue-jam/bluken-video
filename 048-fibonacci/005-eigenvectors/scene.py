@@ -9,24 +9,25 @@ class FibonacciEigenvectors(Scene):
         known = MathTex(
             r"A=\begin{pmatrix}1&1\\1&0\end{pmatrix},\qquad"
             r"\lambda=\frac{1\pm\sqrt5}{2},\qquad"
-            r"\boldsymbol{x}=\begin{pmatrix}x_1 \\ x_2\end{pmatrix}",
+            r"\boldsymbol{x}=\begin{pmatrix}a \\ b\end{pmatrix}",
             font_size=39,
         ).next_to(title, DOWN, buff=0.4)
         orig_eq = MathTex(
             r"A \boldsymbol{x} = \lambda \boldsymbol{x}"
         ).next_to(known, DOWN, buff=0.70)
         self.play(Write(title), Write(known))
+        self.wait(duration=10)
         self.play(Write(orig_eq))
-        self.wait()
+        self.wait(duration=20)
 
         equation = MathTex(
             r"\begin{pmatrix}1&1\\1&0\end{pmatrix}"
-            r"\begin{pmatrix}x_1\\x_2\end{pmatrix}="
-            r"\frac{1\pm\sqrt5}{2}\begin{pmatrix}x_1\\x_2\end{pmatrix}",
+            r"\begin{pmatrix}a\\b\end{pmatrix}="
+            r"\frac{1\pm\sqrt5}{2}\begin{pmatrix}a\\b\end{pmatrix}",
             font_size=41,
         ).move_to(orig_eq)
         self.play(ReplacementTransform(orig_eq, equation))
-        self.wait()
+        self.wait(20)
 
         coefficient_matrix = Matrix(
             [["1", "1"], ["1", "0"]],
@@ -34,12 +35,12 @@ class FibonacciEigenvectors(Scene):
             right_bracket=")",
         ).scale(0.72)
         vector = Matrix(
-            [[r"x_1"], [r"x_2"]],
+            [[r"a"], [r"b"]],
             left_bracket="(",
             right_bracket=")",
         ).scale(0.72)
         result_vector = Matrix(
-            [[r"x_1+x_2"], [r"x_1"]],
+            [[r"a+b"], [r"a"]],
             h_buff=2.1,
             left_bracket="(",
             right_bracket=")",
@@ -54,8 +55,8 @@ class FibonacciEigenvectors(Scene):
         self.play(Write(vector_product))
 
         vector_calculations = [
-            (0, "1", r"x_1", "1", r"x_2", r"x_1+x_2"),
-            (1, "1", r"x_1", "0", r"x_2", r"x_1"),
+            (0, "1", r"a", "1", r"b", r"a+b"),
+            (1, "1", r"a", "0", r"b", r"a"),
         ]
         displayed_answers = VGroup()
         for row_index, first_a, first_b, second_a, second_b, answer in vector_calculations:
@@ -115,21 +116,23 @@ class FibonacciEigenvectors(Scene):
                     )
                 )
             )
+        self.wait(duration=20)
 
         expanded = MathTex(
-            r"\begin{pmatrix}x_1+x_2\\x_1\end{pmatrix}="
-            r"\begin{pmatrix}\frac{1\pm\sqrt5}{2}x_1\\\frac{1\pm\sqrt5}{2}x_2\end{pmatrix}",
+            r"\begin{pmatrix}a+b\\a\end{pmatrix}="
+            r"\begin{pmatrix}\frac{1\pm\sqrt5}{2}a\\\frac{1\pm\sqrt5}{2}b\end{pmatrix}",
             font_size=40,
         ).move_to(equation)
-        relation = MathTex(r"x_1=\frac{1\pm\sqrt5}{2}x_2", font_size=41).next_to(expanded, DOWN, buff=0.5)
+        relation = MathTex(r"a=\frac{1\pm\sqrt5}{2}b", font_size=41).next_to(expanded, DOWN, buff=0.5)
         relation.next_to(expanded, DOWN, buff=0.5)
         self.play(ReplacementTransform(VGroup(equation, vector_product, displayed_answers), expanded))
+        self.wait(duration=20)
         self.play(Write(relation))
-        self.wait()
+        self.wait(duration=20)
 
         self.play(FadeOut(VGroup(expanded, relation)))
         choose = VGroup(
-            MathTex(r"x_2=1", font_size=37),
+            MathTex(r"b=1", font_size=37),
             Text("とすれば", font_size=29),
         ).arrange(RIGHT, buff=0.15).next_to(known, DOWN, buff=0.45)
         vectors = MathTex(
@@ -144,7 +147,7 @@ class FibonacciEigenvectors(Scene):
         self.play(Write(choose))
         self.play(Write(vectors))
         self.play(Write(lambdas))
-        self.wait()
+        self.wait(duration=20)
 
         shifted_vectors = vectors.copy().next_to(title, DOWN, buff=1)
         shifted_lambdas = lambdas.copy().next_to(shifted_vectors, DOWN, buff=0.45)
@@ -160,4 +163,4 @@ class FibonacciEigenvectors(Scene):
         ).next_to(lambdas, DOWN, buff=0.5)
         self.play(Write(p_matrix))
         self.play(Circumscribe(p_matrix, color=YELLOW))
-        self.wait(2)
+        self.wait(20)

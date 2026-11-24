@@ -51,6 +51,7 @@ class DeriveBinetFormula(Scene):
             run_time=2.2,
         )
         self.play(Circumscribe(VGroup(inverse_label, inverse_power, inverse_factor, general_result_matrix), color=GREEN))
+        self.wait(10)
         self.play(FadeOut(VGroup(
             inverse_label, inverse_power, inverse_factor, general_result_matrix
         )))
@@ -112,7 +113,7 @@ class DeriveBinetFormula(Scene):
             top_row.animate.arrange(RIGHT, buff=0.5).next_to(title, DOWN, buff=0.4),
             run_time=1.5,
         )
-        self.wait()
+        self.wait(20)
 
         # 同じ「対角化」の下書き12。前の計算を消して、同時表示量を抑える。
         diagonal = MathTex(
@@ -120,6 +121,7 @@ class DeriveBinetFormula(Scene):
             font_size=40,
         ).next_to(top_row, DOWN, buff=0.45)
         self.play(Write(diagonal))
+        self.wait(20)
 
         # (P^{-1}AP) を n 個並べ、境目の PP^{-1} が消える様子を見せる。
         # 下書き12の横長な式を2段に分け、打ち消す箇所を色で追いやすくする。
@@ -186,7 +188,7 @@ class DeriveBinetFormula(Scene):
 
         self.play(Write(collapsed_rhs[3:]), run_time=1.2)
         power_identity = VGroup(power_lhs, collapsed_rhs)
-        self.wait()
+        self.wait(20)
 
         # 下書き13: A^n=P D^n P^{-1} を展開する。
         self.play(FadeOut(VGroup(diagonal, power_identity)))
@@ -205,6 +207,7 @@ class DeriveBinetFormula(Scene):
             r"\begin{pmatrix}\lambda_1^n&0\\0&\lambda_2^n\end{pmatrix}P^{-1}",
             font_size=48,
         ).next_to(givens2, DOWN, buff=0.5)
+        self.wait(20)
 
         # 1 本の等式の中で、まず P だけを具体的な行列に置き換える。
         p_substituted = MathTex(
@@ -247,6 +250,7 @@ class DeriveBinetFormula(Scene):
             first_result_matrix,
             MathTex(r"P^{-1}", font_size=33),
         ).arrange(RIGHT, buff=0.22).next_to(givens2, DOWN, buff=0.5)
+        self.wait(10)
 
         # 最後に P^{-1} も具体化する。
         product = MathTex(
@@ -310,7 +314,7 @@ class DeriveBinetFormula(Scene):
         self.play(
             ReplacementTransform(VGroup(animated_product, first_answers), product),
         )
-        self.wait()
+        self.wait(10)
 
         # 下書き14: 積を計算し、1行2列成分だけを取り出す。
         left_matrix = Matrix(
@@ -421,7 +425,7 @@ class DeriveBinetFormula(Scene):
             FadeOut(VGroup(final_animated_product, displayed_answers, givens2)),
             Write(expanded),
         )
-        self.wait()
+        self.wait(20)
 
         entry = MathTex(
             r"F_n=\frac{1}{\lambda_1-\lambda_2}(\lambda_1^n-\lambda_2^n)",
@@ -429,6 +433,7 @@ class DeriveBinetFormula(Scene):
         )
         entry.next_to(expanded, DOWN, buff=0.6)
         self.play(Write(entry))
+        self.wait(20)
 
         # 固有値を一般項へ代入し、分母が sqrt(5) になるまでを段階的に示す。
         eigenvalues = MathTex(
@@ -437,7 +442,7 @@ class DeriveBinetFormula(Scene):
             font_size=43,
         ).next_to(entry, DOWN, buff=0.45)
         self.play(Write(eigenvalues))
-        self.wait(0.5)
+        self.wait(20)
 
         substituted = MathTex(
             r"F_n=\frac{1}{"
@@ -478,7 +483,7 @@ class DeriveBinetFormula(Scene):
         self.play(Write(denominator_steps[1]))
         self.play(Write(denominator_steps[2]))
         self.play(Circumscribe(denominator_steps[2][-2:], color=YELLOW))
-        self.wait(0.5)
+        self.wait(15)
 
         bine = MathTex(
             r"F_n=\frac1{\sqrt5}\left\{\left(\frac{1+\sqrt5}{2}\right)^n-"
@@ -491,4 +496,4 @@ class DeriveBinetFormula(Scene):
             run_time=1.6,
         )
         self.play(Circumscribe(bine, color=YELLOW))
-        self.wait(2)
+        self.wait(20)

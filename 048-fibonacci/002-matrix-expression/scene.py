@@ -6,6 +6,8 @@ class FibonacciMatrixExpression(Scene):
 
     def construct(self):
         title = Text("行列とその掛け算", font_size=42, color=BLUE).to_edge(UP)
+        self.play(Write(title))
+
         matrix = Matrix(
             [[r"a_{11}", r"a_{12}"], [r"a_{21}", r"a_{22}"]],
             left_bracket="(",
@@ -17,10 +19,9 @@ class FibonacciMatrixExpression(Scene):
         column_label = Text("列", color=BLUE, font_size=28).next_to(column_box, DOWN)
         entry_label = Text("成分", color=GREEN, font_size=26).next_to(matrix.get_entries()[3], RIGHT, buff=0.45)
         entry_arrow = Arrow(entry_label.get_left(), matrix.get_entries()[3].get_right(), color=GREEN, buff=0.08)
-        self.play(Write(title))
         self.play(Create(matrix), Create(row_box), Create(column_box), Write(row_label), Write(column_label))  # 下書き3・①
         self.play(GrowArrow(entry_arrow), Write(entry_label))
-        self.wait()
+        self.wait(duration=20)
 
         self.play(FadeOut(VGroup(matrix, row_box, column_box, row_label, column_label, entry_label, entry_arrow)))
         left_matrix = Matrix(
@@ -54,6 +55,7 @@ class FibonacciMatrixExpression(Scene):
         ).next_to(product, DOWN, buff=0.35)
         self.play(Write(product))  # 下書き3・②
         self.play(Write(guide))
+        self.wait(duration=20)
 
         calculations = [
             (0, 0, r"a_{11}", r"b_{11}", r"a_{12}", r"b_{21}"),
@@ -124,7 +126,8 @@ class FibonacciMatrixExpression(Scene):
                 ),
             )
 
-        self.wait()
+        self.wait(duration=20)
+
         self.play(FadeOut(VGroup(product, guide, displayed_answers)), FadeOut(title))
         title = Text("フィボナッチ数の行列表現", font_size=40, color=BLUE).to_edge(UP)
         identity = MathTex(
@@ -133,6 +136,7 @@ class FibonacciMatrixExpression(Scene):
             font_size=43,
         ).next_to(title, DOWN, buff=0.4)
         self.play(Write(title), Write(identity))
+        self.wait(duration=20)
 
         def animate_numeric_product(obj, power, left_values, right_values, result_values):
             """行と列を順に取り出して、数値行列の積を1成分ずつ計算する。"""
@@ -240,4 +244,4 @@ class FibonacciMatrixExpression(Scene):
 
         square = animate_numeric_product(identity, 2, [[1, 1], [1, 0]], [[1, 1], [1, 0]], [[2, 1], [1, 1]])
         animate_numeric_product(square, 4, [[2, 1], [1, 1]], [[2, 1], [1, 1]], [[5, 3], [3, 2]])
-        self.wait(2)
+        self.wait(duration=20)

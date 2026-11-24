@@ -6,16 +6,19 @@ class DiagonalizationIdea(Scene):
 
     def construct(self):
         title = Text("正方行列の対角化", font_size=42, color=BLUE).to_edge(UP)
+        square_matrix = Text("行の数と列の数が同じ行列を正方行列という", font_size=30)
+        square_matrix.next_to(title, DOWN, buff=0.35)
+        self.play(Write(title), Write(square_matrix))
+        self.wait(20)
+
         definition = VGroup(
-            Text("行の数と列の数が同じ行列を正方行列という", font_size=30),
-            VGroup(
-                Text("正方行列", font_size=30),
-                MathTex("A", font_size=36),
-                Text("は、別の行列", font_size=30),
-                MathTex("P", font_size=36),
-                Text("を用いて", font_size=30),
-            ).arrange(RIGHT, buff=0.12),
-        ).arrange(DOWN, buff=0.35).next_to(title, DOWN, buff=0.45)
+            Text("正方行列", font_size=30),
+            MathTex("A", font_size=36),
+            Text("は、別の行列", font_size=30),
+            MathTex("P", font_size=36),
+            Text("を用いて", font_size=30),
+        ).arrange(RIGHT, buff=0.12)
+        definition.next_to(square_matrix, DOWN, buff=0.45)
         equation = MathTex(
             r"P^{-1}AP=",
             r"\begin{pmatrix}\lambda_1&0\\0&\lambda_2\end{pmatrix}",
@@ -32,13 +35,15 @@ class DiagonalizationIdea(Scene):
             font_size=39,
         )
         inverse.next_to(equation, DOWN, buff=1.0)
-        self.play(Write(title), Write(definition))
-        self.play(Write(equation), Write(lambda_note), Create(diagonal_box), Write(diagonal_label))
+        self.play(Write(definition), Write(equation), Write(lambda_note))
+        self.wait(20)
+        self.play(Create(diagonal_box), Write(diagonal_label))
+        self.wait(20)
         self.play(Write(inverse))
-        self.wait()
+        self.wait(20)
 
         # 下書き6: ①2乗、②k乗
-        self.play(FadeOut(VGroup(definition, lambda_note, diagonal_box, diagonal_label, inverse)))
+        self.play(FadeOut(VGroup(square_matrix, definition, lambda_note, diagonal_box, diagonal_label, inverse)))
         equation.generate_target()
         equation.target.next_to(title, DOWN, buff=0.45)
         self.play(MoveToTarget(equation))
@@ -145,4 +150,4 @@ class DiagonalizationIdea(Scene):
             )
 
         self.play(Write(general))  # 下書き6・②
-        self.wait(2)
+        self.wait(20)
